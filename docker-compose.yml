@@ -1,0 +1,32 @@
+version: '3'
+
+services:
+  database:
+    platform: "linux/x86_64"
+    image: "mysql:latest"
+    container_name: "db-mysql"
+    ports:
+      - "33062:3306"
+    environment:
+      MYSQL_DATABASE: "yourdb"
+      MYSQL_ROOT_PASSWORD: "strong_password"
+    volumes:
+      - "./scripts/data.sql:/docker-entrypoint-initdb.d/data.sql"
+    networks:
+      - "mynet"
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: on-failure
+    ports:
+      - "30801:8081"
+    depends_on:
+      - "database"
+    networks:
+      - "mynet"
+
+networks:
+  mynet:
+    driver: "bridge"
